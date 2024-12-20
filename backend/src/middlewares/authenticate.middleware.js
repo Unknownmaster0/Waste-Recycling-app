@@ -11,7 +11,7 @@ export const authenticateUser = async function (req, res, next) {
     req.user = payload;
     next();
   } catch (err) {
-    console.log(`Error: ${err}`);
+    console.log(`Error while authenticate user middleware: ${err}`);
     return res.status(400).json(new ApiResponse(400, 'User not exist!', ''));
   }
 };

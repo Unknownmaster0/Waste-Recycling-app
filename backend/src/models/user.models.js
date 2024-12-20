@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const userSchema = new mongoose.Schema(
   {
@@ -17,11 +18,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    phone: {
-      type: String,
-      required: true,
-      unique: true,
-    },
     quiz_score: {
       type: String,
       default: '0',
@@ -32,7 +28,12 @@ const userSchema = new mongoose.Schema(
     },
     otp: {
       type: String,
-    }
+      default: '000000',
+    },
+    signUp: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -63,6 +64,17 @@ userSchema.methods.validatePassword = async function (password) {
       `this error while validating the password through bcrypt: ${error.message}`
     );
   }
+};
+
+userSchema.methods.generateToken = function () {
+  return jwt.sign(
+    {
+      id: this._id,
+      email: this.email,
+      user_name: this.user_name,
+    },
+    process.env.ACCESS_TOKEN
+  );
 };
 
 const User = mongoose.model('User', userSchema);
