@@ -9,20 +9,20 @@ export const verifyNearbyInput = async (req, res, next) => {
   lat = parseFloat(lat);
   lng = parseFloat(lng);
 
-  if (lat < -90 && lat > 90) {
+  if (lat < -90 || lat > 90) {
     return res
       .status(400)
       .json({ message: 'Latitude should be between -90 and 90' });
   }
 
-  if (lng < -180 && lng > 180) {
+  if (lng < -180 || lng > 180) {
     return res
       .status(400)
       .json({ message: 'longitude should be between -180 and 180' });
   }
 
-  req.lat = lat
-  req.lng = lng
+  req.lat = lat;
+  req.lng = lng;
 
   next();
 };
