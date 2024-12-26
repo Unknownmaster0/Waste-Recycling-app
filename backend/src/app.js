@@ -13,6 +13,10 @@ app.use(express.static('public')); // to store some favicon, pdf, locally on my 
 
 // Importing the routes
 import userRoute from './routes/user.routes.js';
+import locationRoute from './routes/location.routes.js';
+
+// Using the routes
 app.use('/api/v1/user', userRoute);
+app.use('/api/v1/location', locationRoute);
 
 export default app;
