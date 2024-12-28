@@ -39,37 +39,17 @@ export const nearbyLocation = async (req, res) => {
   }
 };
 
-export const calculateDistance = async (req, res) => {
-  const { userLat, userLng, destination } = req;
-  const distanceMatrixURL = `https://maps.gomaps.pro/maps/api/distancematrix/json?key=${process.env.API_KEY}&origins=${userLat},${userLng}&destinations=${destination.lat},${destination.lng}&mode=driving`;
-
-  try {
-    const response = await fetch(distanceMatrixURL);
-    if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
-
-    const data = await response.json();
-    const element = data.rows[0]?.elements[0];
-
-    if (element?.status === 'OK') {
-      const distance = element.distance.text;
-      const duration = element.duration.text;
-
-      //await showRoute(userLat, userLng, destination);
-      // send the message information to the frontened.
-      return res
-        .status(200)
-        .json(new ApiResponse(200, 'success', { distance, duration }));
-    } else {
-      return res
-        .status(502)
-        .json(new ApiResponse(502, 'Unable to calculate distance.', ''));
-    }
-  } catch (error) {
-    // showError('Error calculating distance.');
-    console.log(`error while calculating distance: `);
-    console.error(error);
-    return res
-      .status(500)
-      .json(new ApiResponse(500, 'Error calculating distance.', ''));
-  }
+export const getDistAndRoute = async (req, res) => {
+  // get the distance and route from the user location to the destination location.
+  // distance, duration and route are the object of the req object, get them and return as response.
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, 'success', {
+        distance: req.distance,
+        duration: req.duration,
+        route: req.route,
+      })
+    );
 };
+
