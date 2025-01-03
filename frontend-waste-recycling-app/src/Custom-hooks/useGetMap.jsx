@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useGetNearbyLocation from "./useGetNearbyLocation";
+import useGetDistAndRoute from "./useGetDistAndRoute";
 
 export default function UseGetMap({ userCoords }) {
   const { data, errorMsg } = useGetNearbyLocation(userCoords);
@@ -32,12 +33,28 @@ export default function UseGetMap({ userCoords }) {
             center.name
           );
           // Add click listener to calculate distance or show info
-          marker.addListener("click", () =>
+          marker.addListener("click", () => {
             // then we need to set the center of the map to that location.
+            const source = {
+              lat: lat,
+              lng: lng,
+            };
+            const destination = {
+              lat: center.geometry.location.lat,
+              lng: center.geometry.location.lng,
+            };
+            const { response, errorMsg } = useGetDistAndRoute(
+              source,
+              destination
+            );
+            if (errorMsg) {
+              return <div>{errorMsg}</div>;
+            }
+            console.log(response);
             alert(
-              `Center: ${center.name}\nLocation: (${center.geometry.location.lat}, ${center.geometry.location.lng})`
-            )
-          );
+              `Destination: ${center.name}\n Time required: ${response.duration}`
+            );
+          });
         });
       } else {
         console.error("No recycling centers found nearby.");

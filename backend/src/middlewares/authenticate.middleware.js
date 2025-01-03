@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import ApiResponse from '../utils/api_response.js';
+import User from '../models/user.models.js';
 
 export const authenticateUser = async function (req, res, next) {
   const token = req.headers.authorization;
@@ -8,7 +9,11 @@ export const authenticateUser = async function (req, res, next) {
   }
   try {
     const payload = jwt.verify(token, process.env.ACCESS_TOKEN);
-    req.user = payload;
+    const user = await User.findById(payload.id);
+    if (!user) {
+      return res.status(404).json(new ApiResponse(404, 'User not found', ''));
+    }
+    req.user = user;
     next();
   } catch (err) {
     console.log(`Error while authenticate user middleware: ${err}`);

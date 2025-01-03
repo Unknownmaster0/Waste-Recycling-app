@@ -1,5 +1,15 @@
 import express from 'express';
+import cors from 'cors';
 const app = express();
+
+// cors policy
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'DELETE', 'PATCH', 'PUT'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 // important middlwares to be used to receive data from the user.
 app.use(express.json({ limit: '20kb' }));
