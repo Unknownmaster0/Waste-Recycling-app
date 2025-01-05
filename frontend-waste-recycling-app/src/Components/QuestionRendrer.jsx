@@ -1,10 +1,11 @@
-import questionStyle from "../Styles/questionStyle";
-import TextRendrer from "./TextRendrer";
+import questionStyle from "../Styles/questionStyle.js";
 
 export default function QuestionRendrer({ question }) {
   return (
     <div>
-      <TextRendrer text={question} textStyle={questionStyle} />
+      <div className="sm:text-4xl text-2xl font-semibold sm:font-bold text-[#f1f7fb] text-wrap font-[Droid Sans, sans-serif]">
+        {question}
+      </div>
     </div>
   );
 }

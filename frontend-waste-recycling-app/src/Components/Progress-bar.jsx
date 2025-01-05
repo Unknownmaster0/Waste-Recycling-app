@@ -1,9 +1,9 @@
 export default function ProgressBar({ width }) {
   return (
-    <div className="">
-      <div className="w-1/2 h-6 rounded-full border-sky-100 bg-yellow-400">
+    <div className="flex justify-center items-center pt-10">
+      <div className="w-[80%] sm:w-[70%] h-3 md:h-4 rounded-full border-sky-100 bg-[#52656d]">
         <div
-          className={`h-full bg-pink-500 rounded-full`}
+          className={`h-full bg-green-400 rounded-full`}
           style={{ width: `${width}%` }}
         ></div>
       </div>
