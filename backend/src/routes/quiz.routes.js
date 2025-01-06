@@ -4,7 +4,7 @@ import { questionVerificationMiddleware } from '../middlewares/quiz.middleware.j
 import { authenticateUser } from '../middlewares/authenticate.middleware.js';
 const router = Router();
 
-router.route('/questions').get(getQuestions);
+router.route('/questions').get(authenticateUser, getQuestions);
 router.route('/scores').get(authenticateUser, getScores);
 // router.route('/scores').get(userScoreMiddleware, getScores);
 // router.route('/answer').post(questionVerificationMiddleware, userScoreMiddleware, checkAnswerAndUpdateScore);
