@@ -6,8 +6,6 @@ const router = Router();
 
 router.route('/questions').get(authenticateUser, getQuestions);
 router.route('/scores').get(authenticateUser, getScores);
-// router.route('/scores').get(userScoreMiddleware, getScores);
-// router.route('/answer').post(questionVerificationMiddleware, userScoreMiddleware, checkAnswerAndUpdateScore);
 router.route('/answer').post(questionVerificationMiddleware, authenticateUser, checkAnswerAndUpdateScore);
 
 export default router;

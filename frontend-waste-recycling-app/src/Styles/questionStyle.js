@@ -1,8 +1,3 @@
-const questionStyle = {
-  fontSize: "30px",
-  fontFamily: "Droid Sans, sans-serif",
-  color: "#f1f7fb",
-  fontWeight: "bolder",
-};
+const questionStyle = "font-medium sm:font-semibold text-2xl sm:text-3xl md:text-4xl";
 
 export default questionStyle;

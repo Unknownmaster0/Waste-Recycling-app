@@ -19,8 +19,8 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     quiz_score: {
-      type: String,
-      default: '0',
+      type: Number,
+      default: 0,
     },
     learning_percentage: {
       type: String,

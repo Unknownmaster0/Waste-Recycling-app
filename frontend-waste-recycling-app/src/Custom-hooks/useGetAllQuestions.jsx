@@ -9,14 +9,17 @@ export default function useGetAllQuestions() {
   useEffect(() => {
     const baseUrl = import.meta.env.VITE_BACKEND_URL;
     if (!baseUrl) {
-      console.error("Backend URL is not defined in environment variables.");
       setErr(new Error("Backend URL is missing."));
       setLoading(false);
       return;
     }
     (async () => {
       try {
-        const response = await axios.get(`${baseUrl}/api/v1/quiz/questions`);
+        const response = await axios.get(`${baseUrl}/api/v1/quiz/questions`, {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        });
         setLoading(false);
         setData(response.data.data || []);
       } catch (error) {

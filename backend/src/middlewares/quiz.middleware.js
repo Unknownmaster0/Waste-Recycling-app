@@ -1,26 +1,5 @@
-// import User from '../models/user.models.js';
+import Quiz from '../models/quizzes.models.js';
 import ApiResponse from '../utils/api_response.js';
-// import jwt from 'jsonwebtoken';
-
-// export const userScoreMiddleware = async (req, res, next) => {
-//   const token = req.headers.authorization;
-//   if (!token) {
-//     return res.status(401).json(new ApiResponse(401, 'Token is required', ''));
-//   }
-
-//   try {
-//     const payload = jwt.verify(token, process.env.ACCESS_TOKEN);
-//     // then get the user of the (user id = payload._id)
-//     const user = await User.findById(payload.id);
-//     if (!user) {
-//       return res.status(404).json(new ApiResponse(404, 'User not found', ''));
-//     }
-//     req.user = user;
-//     next();
-//   } catch (error) {
-//     return res.status(401).json(new ApiResponse(401, 'Invalid token', ''));
-//   }
-// };
 
 export const questionVerificationMiddleware = async (req, res, next) => {
   const { questionId, answer } = req.body;
@@ -32,7 +11,7 @@ export const questionVerificationMiddleware = async (req, res, next) => {
 
   // check if this questionId is present or not.
   try {
-    const question = await Quiz.findById(questionId);
+    const question = await Quiz.findOne({ _id: questionId });
     if (!question) {
       return res
         .status(404)
