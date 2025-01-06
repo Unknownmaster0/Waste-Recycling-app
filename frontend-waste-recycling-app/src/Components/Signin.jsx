@@ -7,54 +7,136 @@ import ButtonComponent from "./Button";
 import axios from "axios";
 import { BottomTexts } from "./BottomTextComponent";
 
-export const Signin = function ({setLoading}) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+export const Signin = function ({
+  setLoading,
+  isOTP,
+  setIsOtp,
+  email,
+  setEmail,
+}) {
   const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+  function onClickHandlerOTP() {
+    (async () => {
+      setLoading(true);
+      try {
+        const res = await axios.post(
+          `${BACKEND_URL}/api/v1/user/login/send-otp?email=${email}`
+        );
+        const response = res.data;
+        if (response.success) {
+          setIsOtp(true);
+        } else {
+          console.log(`error while sending otp to user email`);
+          alert(response.message);
+        }
+      } catch (error) {
+        console.error(error);
+        alert(error.message);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }
+
+  function onClickHandlerSignin() {
+    if (isOTP) {
+      (async () => {
+        setLoading(true);
+        try {
+          const res = await axios.get(
+            `${BACKEND_URL}/api/v1/user/login/verify-otp?email=${email}&otp=${otp}`
+          );
+          const response = res.data;
+          if (response.success) {
+            localStorage.setItem("token", `${response.data}`);
+            setLoading(false);
+            navigate("/main");
+            return;
+          }
+        } catch (error) {
+          alert(error.message);
+        } finally {
+          setLoading(false);
+        }
+      })();
+    } else {
+      (async () => {
+        setLoading(true);
+        try {
+          const response = await axios.post(
+            `${BACKEND_URL}/api/v1/user/login-pass`,
+            {
+              email,
+              password,
+            }
+          );
+
+          if (response.data.success) {
+            localStorage.setItem("token", `${response.data.data}`);
+            setLoading(false);
+            navigate("/main");
+            return;
+          }
+        } catch (error) {
+          alert(error.message);
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }
+  }
 
   return (
     <div className="flex items-center justify-center flex-grow">
       <div className="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8">
-        <TopBar label={"Sign In"} />
+        <TopBar label={"SIGN IN"} />
         <TopBarText text={"Enter the details to "} to={"signin"} />
         <InputComponent
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           label={"Email"}
+          value={email}
           placeholder={"johndoe@gmail.com"}
+          isDisabled={isOTP}
         />
-        <InputComponent
-          onChange={(e) => setPassword(e.target.value)}
-          label={"Password"}
-          placeholder={""}
-        />
-        <ButtonComponent
-          text={"Sign In"}
-          onClickHandler={async () => {
-            setLoading(true);
-            try {
-              const response = await axios.post(
-                `${BACKEND_URL}/api/v1/user/login-pass`,
-                {
-                  username,
-                  password,
-                }
-              );
-              localStorage.setItem("token", `${response.data.data}`);
-
-              if (response.data.success) {
-                setLoading(false);
-                navigate("/main");
-                return;
-              }
-            } catch (error) {
-              alert(error.message);
-            }finally{
-              setLoading(false);
-            }
-          }}
-        />
-        <BottomTexts text={"Create Account?"} buttonText={"SignUp"} to={"/"} />
+        {isOTP ? (
+          <InputComponent
+            onChange={(e) => setOtp(e.target.value)}
+            placeholder={"OTP must be of 6 digits"}
+            label={"OTP"}
+            value={otp}
+          />
+        ) : (
+          <InputComponent
+            onChange={(e) => setPassword(e.target.value)}
+            label={"Password"}
+            placeholder={"***********"}
+            value={password}
+          />
+        )}
+        <div className="space-y-2">
+          <ButtonComponent
+            text={"Sign In"}
+            onClickHandler={onClickHandlerSignin}
+          />
+          {isOTP ? null : (
+            <>
+              <ButtonComponent
+                text={"SIGN IN WITH OTP"}
+                onClickHandler={onClickHandlerOTP}
+                type={"otp"}
+              />
+              <BottomTexts
+                text={"Create Account?"}
+                buttonText={"SIGN UP"}
+                to={"/"}
+              />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
