@@ -54,7 +54,7 @@ export const Signin = function ({
           if (response.success) {
             localStorage.setItem("token", `${response.data}`);
             setLoading(false);
-            navigate("/main");
+            navigate("/");
             return;
           }
         } catch (error) {
@@ -78,7 +78,7 @@ export const Signin = function ({
           if (response.data.success) {
             localStorage.setItem("token", `${response.data.data}`);
             setLoading(false);
-            navigate("/main");
+            navigate("/");
             return;
           }
         } catch (error) {
@@ -132,7 +132,7 @@ export const Signin = function ({
               <BottomTexts
                 text={"Create Account?"}
                 buttonText={"SIGN UP"}
-                to={"/"}
+                to={"/signup"}
               />
             </>
           )}

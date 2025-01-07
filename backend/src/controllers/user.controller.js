@@ -100,7 +100,7 @@ export const signupSendOtp = async function (req, res) {
         password,
         otp,
       });
-    }else{
+    } else {
       // update existing user new mail, username or password whatever thing is required.
       existedUser.email = email;
       existedUser.user_name = username;
@@ -168,4 +168,15 @@ export const otpValidator = async (req, res) => {
   } catch (error) {
     return res.status(502).json(new ApiResponse(502, 'Database error', ''));
   }
+};
+
+export const verifyUser = (req, res) => {
+  const user = req.user;
+  return res.status(200).json(
+    new ApiResponse(200, 'found user', {
+      id: user._id,
+      email: user.email,
+      userName: user.user_name,
+    })
+  );
 };

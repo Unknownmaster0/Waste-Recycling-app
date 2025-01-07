@@ -9,7 +9,7 @@ export const authenticateUser = async function (req, res, next) {
   }
   try {
     const payload = jwt.verify(token, process.env.ACCESS_TOKEN);
-    const user = await User.findById(payload.id);
+    const user = await User.findOne({ _id: payload.id });
     if (!user) {
       return res.status(404).json(new ApiResponse(404, 'User not found', ''));
     }

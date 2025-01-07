@@ -16,11 +16,12 @@ export default function useGetDistAndRoute(source, destination) {
   useEffect(() => {
     (async function () {
       try {
-        const responseData = await axios.get(reqUrl, bodyData);
-        if (responseData.status === 200) {
-          setResponse(responseData.data);
+        const res = await axios.get(reqUrl, bodyData);
+        const response = await res.data;
+        if (response.success) {
+          setResponse(response.data);
         } else {
-          setErrorMsg(`API Error: ${responseData.statusText}`);
+          setErrorMsg(`API Error: ${response.message}`);
         }
       } catch (error) {
         setErrorMsg("Error fetching distance and route.");

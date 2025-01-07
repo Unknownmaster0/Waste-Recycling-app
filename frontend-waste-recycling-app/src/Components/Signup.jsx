@@ -29,7 +29,7 @@ export const Signup = ({ setLoading, isOtp, setIsOtp, email, setEmail }) => {
           );
           if (response.data.success) {
             localStorage.setItem("token", response.data.data);
-            navigate("/main");
+            navigate("/");
           } else {
             alert(response.message);
           }
@@ -66,7 +66,6 @@ export const Signup = ({ setLoading, isOtp, setIsOtp, email, setEmail }) => {
             }
           );
           if (response.data.success) {
-            console.log(`isOtp is set properly`);
             setIsOtp((prev) => !prev);
           } else {
             alert("Signup failed, please check your inputs.");

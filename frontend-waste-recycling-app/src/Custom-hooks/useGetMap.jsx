@@ -1,15 +1,29 @@
 import React, { useEffect, useRef, useState } from "react";
 import useGetNearbyLocation from "./useGetNearbyLocation";
 import useGetDistAndRoute from "./useGetDistAndRoute";
+import Spinner from "../Components/Spinner";
+import useLoadGomaps from "./useLoadGoMaps";
 
 export default function UseGetMap({ userCoords }) {
-  const { data, errorMsg } = useGetNearbyLocation(userCoords);
+  const { isLoaded, error } = useLoadGomaps();
+  const { data, errorMsg, loading } = useGetNearbyLocation(userCoords);
   const { lat, lng } = userCoords;
+  const [destination, setDestination] = useState(null);
+  const [direction, setDirection] = useState(null);
   const mapRef = useRef(null);
+  const directionsRendererRef = useRef(null);
 
-  if (errorMsg !== null) {
-    console.log(`found here`);
-    return <div className="font-4xl text-red-800">{errorMsg}</div>;
+  if (errorMsg || error) {
+    return alert(errorMsg);
+  }
+
+  if (destination) {
+    const { response, errorMsg } = useGetDistAndRoute(userCoords, destination);
+    if (response) {
+      setDirection(response);
+    } else if (errorMsg) {
+      console.error(errorMsg);
+    }
   }
 
   // Function to add a marker
@@ -34,33 +48,18 @@ export default function UseGetMap({ userCoords }) {
           );
           // Add click listener to calculate distance or show info
           marker.addListener("click", () => {
-            // then we need to set the center of the map to that location.
-            const source = {
-              lat: lat,
-              lng: lng,
-            };
-            const destination = {
+            setDestination({
               lat: center.geometry.location.lat,
               lng: center.geometry.location.lng,
-            };
-            const { response, errorMsg } = useGetDistAndRoute(
-              source,
-              destination
-            );
-            if (errorMsg) {
-              return <div>{errorMsg}</div>;
-            }
-            console.log(response);
-            alert(
-              `Destination: ${center.name}\n Time required: ${response.duration}`
-            );
+            });
           });
         });
       } else {
-        console.error("No recycling centers found nearby.");
+        alert("No recycling centers found nearby.");
       }
     } catch (error) {
       console.error("Error fetching recycling centers.", error);
+      alert(error.message);
     }
   };
 
@@ -84,17 +83,25 @@ export default function UseGetMap({ userCoords }) {
     };
 
     // Ensure Google Maps API is loaded
-    if (window.google && window.google.maps) {
+    if (isLoaded) {
       initMap();
-    } else {
-      const interval = setInterval(() => {
-        if (window.google && window.google.maps) {
-          clearInterval(interval);
-          initMap();
-        }
-      }, 100);
     }
-  }, [lat, lng, data]);
+  }, [isLoaded, lat, lng, data]);
 
-  return <div ref={mapRef} style={{ height: "400px", width: "100%" }}></div>;
+  useEffect(() => {
+    if (direction && directionsRendererRef.current) {
+      // Assuming directions is in the format required by the DirectionsRenderer
+      directionsRendererRef.current.setDirections(direction);
+    }
+  }, [direction]);
+
+  return (
+    <div>
+      {loading || !isLoaded ? (
+        <Spinner />
+      ) : (
+        <div ref={mapRef} style={{ height: "500px", width: "100%" }}></div>
+      )}
+    </div>
+  );
 }

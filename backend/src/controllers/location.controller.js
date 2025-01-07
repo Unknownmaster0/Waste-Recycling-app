@@ -11,9 +11,7 @@ export const nearbyLocation = async (req, res) => {
 
     const data = await response.json();
     if (data.results && data.results.length > 0) {
-      return res
-        .status(200)
-        .json(new ApiResponse(200, 'success', data.results));
+      return res.status(200).json(new ApiResponse(200, 'success', data));
     } else {
       //   showError('No recycling centers found nearby.');
       return res
@@ -33,8 +31,6 @@ export const nearbyLocation = async (req, res) => {
         errorMessage = 'The request to get user location timed out.';
         break;
     }
-    // showError(errorMessage);
-    console.error('Geolocation Error:', errorMessage);
     return res.status(500).json(new ApiResponse(500, errorMessage, ''));
   }
 };
@@ -42,14 +38,11 @@ export const nearbyLocation = async (req, res) => {
 export const getDistAndRoute = async (req, res) => {
   // get the distance and route from the user location to the destination location.
   // distance, duration and route are the object of the req object, get them and return as response.
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, 'success', {
-        distance: req.distance,
-        duration: req.duration,
-        route: req.route,
-      })
-    );
+  return res.status(200).json(
+    new ApiResponse(200, 'success', {
+      distance: req.distance,
+      duration: req.duration,
+      route: req.route,
+    })
+  );
 };
-

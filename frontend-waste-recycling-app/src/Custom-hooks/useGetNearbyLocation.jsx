@@ -4,25 +4,26 @@ import { useEffect, useState } from "react";
 export default function useGetNearbyLocation({ lat, lng }) {
   const [data, setData] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     (async function () {
-      const API_KEY = import.meta.env.VITE_API_KEY; // Replace with your actual API key
-      const nearbyPlacesURL = `https://maps.gomaps.pro/maps/api/place/nearbysearch/json?key=${API_KEY}&location=${lat},${lng}&rankby=distance&type=recycling&name=recycling&keyword=recycling&language=en`;
-
       try {
-        const responseData = await axios.get(nearbyPlacesURL);
-        
-        if (responseData.status === 200 && responseData.data.status === "OK") {
-          setData(responseData.data);
+        const res = await axios.get(`${BACKEND_URL}/api/v1/location/get-nearby-center?lat=${lat}&lng=${lng}`);
+        const response = await res.data;
+        if (response.success) {
+          setData(response.data);
         } else {
-          setErrorMsg(`API Error: ${responseData.statusText}`);
+          setErrorMsg(`API Error: ${response.message}`);
         }
       } catch (error) {
         setErrorMsg("Error fetching nearby recycling centers.");
+      } finally{
+        setLoading(false);
       }
     })();
   }, [lat, lng]);
 
-  return { data, errorMsg };
+  return { data, errorMsg , loading};
 }
