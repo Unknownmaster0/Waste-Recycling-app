@@ -7,23 +7,33 @@ export default function useGetNearbyLocation({ lat, lng }) {
   const [loading, setLoading] = useState(true);
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+  console.log(`reached into the useGetNearbyLocation`);
   useEffect(() => {
-    (async function () {
-      try {
-        const res = await axios.get(`${BACKEND_URL}/api/v1/location/get-nearby-center?lat=${lat}&lng=${lng}`);
-        const response = await res.data;
-        if (response.success) {
-          setData(response.data);
-        } else {
-          setErrorMsg(`API Error: ${response.message}`);
+    if (!lat || !lng) {
+      setData(null);
+      setErrorMsg(null);
+      setLoading(false);
+      return;
+    } else {
+      (async function () {
+        try {
+          const res = await axios.get(
+            `${BACKEND_URL}/api/v1/location/get-nearby-center?lat=${lat}&lng=${lng}`
+          );
+          const response = await res.data;
+          if (response.success) {
+            setData(response.data);
+          } else {
+            setErrorMsg(`API Error: ${response.message}`);
+          }
+        } catch (error) {
+          setErrorMsg("Error fetching nearby recycling centers.");
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        setErrorMsg("Error fetching nearby recycling centers.");
-      } finally{
-        setLoading(false);
-      }
-    })();
+      })();
+    }
   }, [lat, lng]);
 
-  return { data, errorMsg , loading};
+  return { data, errorMsg, loading };
 }

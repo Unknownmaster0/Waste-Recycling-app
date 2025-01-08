@@ -7,6 +7,7 @@ async function getUserLocation() {
 }
 
 export default function useGetUserLocation() {
+  console.log(`reached into the useGetUserLocation`);
   const [userCoords, setUserCoords] = useState({ lat: null, lng: null });
   const [locationError, setLocationError] = useState(null);
 

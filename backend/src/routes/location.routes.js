@@ -17,7 +17,7 @@ const router = Router();
 router.route('/get-nearby-center').get(verifyNearbyInput, nearbyLocation);
 router
   .route('/get-direction')
-  .get(
+  .post(
     validateCalcdist,
     calcDistMiddleware,
     getRouteMiddleware,

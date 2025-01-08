@@ -2,29 +2,43 @@ import React, { useEffect, useRef, useState } from "react";
 import useGetNearbyLocation from "./useGetNearbyLocation";
 import useGetDistAndRoute from "./useGetDistAndRoute";
 import Spinner from "../Components/Spinner";
-import useLoadGomaps from "./useLoadGoMaps";
 
-export default function UseGetMap({ userCoords }) {
-  const { isLoaded, error } = useLoadGomaps();
+export default function UseGetMap({ userCoords, isLoaded, error }) {
+  console.log(`reached into the useGetMap`);
   const { data, errorMsg, loading } = useGetNearbyLocation(userCoords);
   const { lat, lng } = userCoords;
-  const [destination, setDestination] = useState(null);
+  const [destination, setDestination] = useState({ lat: null, lng: null });
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [direction, setDirection] = useState(null);
   const mapRef = useRef(null);
   const directionsRendererRef = useRef(null);
+  const { response, errorMsg: err } = useGetDistAndRoute(
+    userCoords,
+    destination
+  );
 
-  if (errorMsg || error) {
-    return alert(errorMsg);
-  }
-
-  if (destination) {
-    const { response, errorMsg } = useGetDistAndRoute(userCoords, destination);
+  useEffect(() => {
     if (response) {
       setDirection(response);
-    } else if (errorMsg) {
-      console.error(errorMsg);
     }
-  }
+  }, [response, err]);
+
+  // Check for errors and render them
+  useEffect(() => {
+    if (destination.lat && destination.lng) {
+      if (error) {
+        setIsError(true);
+        setErrorMessage(errorMsg);
+      } else if (err) {
+        setIsError(true);
+        setErrorMessage(err);
+      } else if (errorMsg) {
+        setIsError(true);
+        setErrorMessage(errorMsg);
+      }
+    }
+  }, [destination, error, err, errorMsg]);
 
   // Function to add a marker
   const addMarker = (markerLat, markerLng, title) => {
@@ -63,30 +77,40 @@ export default function UseGetMap({ userCoords }) {
     }
   };
 
-  useEffect(() => {
-    const initMap = () => {
-      const map = new window.google.maps.Map(mapRef.current, {
-        center: { lat: lat || 0, lng: lng || 0 },
-        zoom: 14,
-      });
+  const initMap = () => {
+    if (!window.google || !window.google.maps) return;
 
-      // Store map instance for markers
-      mapRef.current.mapInstance = map;
+    const map = new window.google.maps.Map(mapRef.current, {
+      center: { lat: lat || 0, lng: lng || 0 },
+      zoom: 14,
+    });
+    console.log(`Initializing map with coordinates `);
 
-      // Add user's location marker
-      addMarker(lat, lng, "You are here");
+    // Store map instance for markers
+    mapRef.current.mapInstance = map;
 
-      // Add nearby recycling centers
-      if (data) {
-        renderNearbyLocation(data);
-      }
-    };
+    // Add user's location marker
+    addMarker(lat, lng, "You are here");
 
-    // Ensure Google Maps API is loaded
-    if (isLoaded) {
-      initMap();
+    // Add nearby recycling centers
+    if (data) {
+      renderNearbyLocation(data);
     }
-  }, [isLoaded, lat, lng, data]);
+  };
+
+  useEffect(() => {
+    // Ensure Google Maps API is loaded
+    if (isLoaded && mapRef.current) {
+      initMap();
+    } else {
+      const interval = setInterval(() => {
+        if (window.google && window.google.maps) {
+          clearInterval(interval);
+          initMap();
+        }
+      }, 100);
+    }
+  }, [mapRef, isLoaded, lat, lng, data]);
 
   useEffect(() => {
     if (direction && directionsRendererRef.current) {
@@ -96,11 +120,15 @@ export default function UseGetMap({ userCoords }) {
   }, [direction]);
 
   return (
-    <div>
+    <div className="h-full">
       {loading || !isLoaded ? (
         <Spinner />
+      ) : isError ? (
+        <div className="h-full font-bold text-xl md:text-3xl lg:text-4xl text-red-700 font-serif">
+          {errorMessage}
+        </div>
       ) : (
-        <div ref={mapRef} style={{ height: "500px", width: "100%" }}></div>
+        <div ref={mapRef} className="h-[80%] w-full"></div>
       )}
     </div>
   );

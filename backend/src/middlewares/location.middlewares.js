@@ -34,6 +34,9 @@ export const validateCalcdist = async (req, res, next) => {
   const { lat, lng } = req.query;
   const destination = req.body;
 
+  console.log(`lat: ${lat}, lng: ${lng}`);
+  console.log(`destination: ${destination}`);
+
   if (!lat || !lng || !destination || !destination.lat || !destination.lng)
     return res.status(400).json(new ApiResponse(400, 'Invalid input', ''));
 
