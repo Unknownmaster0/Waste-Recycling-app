@@ -34,9 +34,6 @@ export const validateCalcdist = async (req, res, next) => {
   const { lat, lng } = req.query;
   const destination = req.body;
 
-  console.log(`lat: ${lat}, lng: ${lng}`);
-  console.log(`destination: ${destination}`);
-
   if (!lat || !lng || !destination || !destination.lat || !destination.lng)
     return res.status(400).json(new ApiResponse(400, 'Invalid input', ''));
 
@@ -91,8 +88,10 @@ export const getRouteMiddleware = async (req, res, next) => {
     const route = data.routes[0]?.overview_polyline?.points;
 
     if (route) {
-      const decodedPath = decodePolyline(route);
-      req.decodedPath = decodedPath;
+      // const decodedPath = decodePolyline(route);
+      // req.decodedPath = decodedPath;
+      // req.route = decodedPath;
+      req.data = data;
       next();
       // ==== the below thing must be done in the frontend, so that to keep track of the map that has been the global map =====
       //   const routePath = new google.maps.Polyline({

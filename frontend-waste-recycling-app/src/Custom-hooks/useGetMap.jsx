@@ -4,13 +4,12 @@ import useGetDistAndRoute from "./useGetDistAndRoute";
 import Spinner from "../Components/Spinner";
 
 export default function UseGetMap({ userCoords, isLoaded, error }) {
-  console.log(`reached into the useGetMap`);
+  // console.log(`reached into the useGetMap`);
   const { data, errorMsg, loading } = useGetNearbyLocation(userCoords);
   const { lat, lng } = userCoords;
   const [destination, setDestination] = useState({ lat: null, lng: null });
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [direction, setDirection] = useState(null);
   const mapRef = useRef(null);
   const directionsRendererRef = useRef(null);
   const { response, errorMsg: err } = useGetDistAndRoute(
@@ -19,10 +18,46 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
   );
 
   useEffect(() => {
-    if (response) {
-      setDirection(response);
+    if (response && directionsRendererRef.current) {
+      // Check if routes exist
+      if (
+        !response.data ||
+        !response.data.routes ||
+        response.data.routes.length === 0
+      ) {
+        console.error("No routes found in the response");
+        return; // Exit if no routes are found
+      }
+
+      const directionsResult = {
+        routes: response.data.routes.map((route) => ({
+          legs: route.legs.map((leg) => ({
+            distance: leg.distance,
+            duration: leg.duration,
+            start_address: leg.start_address,
+            end_address: leg.end_address,
+            start_location: leg.start_location,
+            end_location: leg.end_location,
+            steps: leg.steps.map((step) => ({
+              distance: step.distance,
+              duration: step.duration,
+              start_location: step.start_location,
+              end_location: step.end_location,
+              travel_mode: step.travel_mode,
+              instructions: step.html_instructions,
+              polyline: step.polyline.points, // This is the encoded polyline
+            })),
+          })),
+          overview_polyline: route.overview_polyline.points, // This is the encoded polyline for the entire route
+          summary: route.summary,
+        })),
+        status: response.data.status,
+      };
+
+      // Set the directions to the DirectionsRenderer
+      directionsRendererRef.current.setDirections(directionsResult);
     }
-  }, [response, err]);
+  }, [response]);
 
   // Check for errors and render them
   useEffect(() => {
@@ -84,7 +119,10 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
       center: { lat: lat || 0, lng: lng || 0 },
       zoom: 14,
     });
-    console.log(`Initializing map with coordinates `);
+
+    const directionsRenderer = new window.google.maps.DirectionsRenderer();
+    directionsRenderer.setMap(map);
+    directionsRendererRef.current = directionsRenderer; // Store the reference
 
     // Store map instance for markers
     mapRef.current.mapInstance = map;
@@ -95,6 +133,13 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
     // Add nearby recycling centers
     if (data) {
       renderNearbyLocation(data);
+    } else {
+      const interval = setInterval(() => {
+        if (data) {
+          clearInterval(interval);
+          renderNearbyLocation(data);
+        }
+      }, 100);
     }
   };
 
@@ -111,13 +156,6 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
       }, 100);
     }
   }, [mapRef, isLoaded, lat, lng, data]);
-
-  useEffect(() => {
-    if (direction && directionsRendererRef.current) {
-      // Assuming directions is in the format required by the DirectionsRenderer
-      directionsRendererRef.current.setDirections(direction);
-    }
-  }, [direction]);
 
   return (
     <div className="h-full">

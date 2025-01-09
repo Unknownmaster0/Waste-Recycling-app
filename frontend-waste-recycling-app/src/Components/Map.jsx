@@ -3,7 +3,7 @@ import useGetUserLocation from "../Custom-hooks/useGetUserLocation";
 import useLoadGomaps from "../Custom-hooks/useLoadGoMaps";
 
 export default function Map() {
-  console.log(`reached into the Map`);
+  // console.log(`reached into the Map`);
   const { userCoords, locationError } = useGetUserLocation();
   const { isLoaded, error } = useLoadGomaps();
 

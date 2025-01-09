@@ -4,7 +4,7 @@ const useLoadGomaps = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
   const apiKey = import.meta.env.VITE_API_KEY;
-  console.log(`reached into the useLoadGomaps`);
+  // console.log(`reached into the useLoadGomaps`);
 
   useEffect(() => {
     const loadScript = () => {

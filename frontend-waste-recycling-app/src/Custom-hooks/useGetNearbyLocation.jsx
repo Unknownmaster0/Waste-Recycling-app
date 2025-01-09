@@ -7,7 +7,7 @@ export default function useGetNearbyLocation({ lat, lng }) {
   const [loading, setLoading] = useState(true);
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-  console.log(`reached into the useGetNearbyLocation`);
+  // console.log(`reached into the useGetNearbyLocation`);
   useEffect(() => {
     if (!lat || !lng) {
       setData(null);

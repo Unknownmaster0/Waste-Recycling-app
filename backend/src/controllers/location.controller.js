@@ -40,9 +40,7 @@ export const getDistAndRoute = async (req, res) => {
   // distance, duration and route are the object of the req object, get them and return as response.
   return res.status(200).json(
     new ApiResponse(200, 'success', {
-      distance: req.distance,
-      duration: req.duration,
-      route: req.route,
+      data: req.data,
     })
   );
 };
