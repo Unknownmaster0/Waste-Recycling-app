@@ -117,13 +117,13 @@ export const Signin = function ({
             value={password}
           />
         )}
-        <div className="space-y-2">
+        <div className="space-y-2 sm:mt-4 block">
           <ButtonComponent
             text={"Sign In"}
             onClickHandler={onClickHandlerSignin}
           />
           {isOTP ? null : (
-            <>
+            <div className="block">
               <ButtonComponent
                 text={"SIGN IN WITH OTP"}
                 onClickHandler={onClickHandlerOTP}
@@ -134,7 +134,7 @@ export const Signin = function ({
                 buttonText={"SIGN UP"}
                 to={"/signup"}
               />
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -1,13 +1,9 @@
 import { AppBar } from "./AppBarComponent";
 
-export default function Layout({
-  userName = null,
-  isLoggedIn = false,
-  children,
-}) {
+export default function Layout({ children }) {
   return (
     <div className="h-screen flex flex-col">
-      <AppBar username={userName} logout={isLoggedIn} />
+      <AppBar />
       {children}
     </div>
   );

@@ -2,9 +2,16 @@ import useGetLoggedIn from "../Custom-hooks/useGetLoggedIn";
 import Spinner from "../Components/Spinner";
 import Main from "../Components/Main";
 import Layout from "../Components/Layout";
+import { useContext, useEffect } from "react";
+import { UserContext } from "../Context/user.context";
 
 export default function MainPage() {
   const { isLoggedIn, loading, err, userName } = useGetLoggedIn();
+  const { setUserName } = useContext(UserContext);
+
+  useEffect(() => {
+    setUserName(userName);
+  }, [isLoggedIn, userName]);
 
   if (err) {
     alert(err);
@@ -16,11 +23,7 @@ export default function MainPage() {
         <Spinner />
       ) : (
         <>
-          <Layout
-            userName={userName}
-            isLoggedIn={isLoggedIn}
-            children={<Main />}
-          />
+          <Layout children={<Main />} />
         </>
       )}
     </>

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import useGetNearbyLocation from "./useGetNearbyLocation";
 import Spinner from "../Components/Spinner";
-import MapWithDirections from "../Components/MapWithDirection";
 import { useNavigate } from "react-router-dom";
 
 export default function UseGetMap({ userCoords, isLoaded, error }) {
@@ -93,7 +92,7 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
   useEffect(() => {
     // Ensure Google Maps API is loaded
     const interval = setInterval(() => {
-      if (isLoaded && window.google && window.google.maps) {
+      if (isLoaded && window.google && window.google.maps && mapRef && mapRef.current) {
         clearInterval(interval);
         initMap();
       }
