@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import useGetNearbyLocation from "./useGetNearbyLocation";
-import useGetDistAndRoute from "./useGetDistAndRoute";
 import Spinner from "../Components/Spinner";
+import MapWithDirections from "../Components/MapWithDirection";
+import { useNavigate } from "react-router-dom";
 
 export default function UseGetMap({ userCoords, isLoaded, error }) {
   // console.log(`reached into the useGetMap`);
+  const navigate = useNavigate();
   const { data, errorMsg, loading } = useGetNearbyLocation(userCoords);
   const { lat, lng } = userCoords;
   const [destination, setDestination] = useState({ lat: null, lng: null });
@@ -12,52 +14,6 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
   const [errorMessage, setErrorMessage] = useState(null);
   const mapRef = useRef(null);
   const directionsRendererRef = useRef(null);
-  const { response, errorMsg: err } = useGetDistAndRoute(
-    userCoords,
-    destination
-  );
-
-  useEffect(() => {
-    if (response && directionsRendererRef.current) {
-      // Check if routes exist
-      if (
-        !response.data ||
-        !response.data.routes ||
-        response.data.routes.length === 0
-      ) {
-        console.error("No routes found in the response");
-        return; // Exit if no routes are found
-      }
-
-      const directionsResult = {
-        routes: response.data.routes.map((route) => ({
-          legs: route.legs.map((leg) => ({
-            distance: leg.distance,
-            duration: leg.duration,
-            start_address: leg.start_address,
-            end_address: leg.end_address,
-            start_location: leg.start_location,
-            end_location: leg.end_location,
-            steps: leg.steps.map((step) => ({
-              distance: step.distance,
-              duration: step.duration,
-              start_location: step.start_location,
-              end_location: step.end_location,
-              travel_mode: step.travel_mode,
-              instructions: step.html_instructions,
-              polyline: step.polyline.points, // This is the encoded polyline
-            })),
-          })),
-          overview_polyline: route.overview_polyline.points, // This is the encoded polyline for the entire route
-          summary: route.summary,
-        })),
-        status: response.data.status,
-      };
-
-      // Set the directions to the DirectionsRenderer
-      directionsRendererRef.current.setDirections(directionsResult);
-    }
-  }, [response]);
 
   // Check for errors and render them
   useEffect(() => {
@@ -65,15 +21,12 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
       if (error) {
         setIsError(true);
         setErrorMessage(errorMsg);
-      } else if (err) {
-        setIsError(true);
-        setErrorMessage(err);
       } else if (errorMsg) {
         setIsError(true);
         setErrorMessage(errorMsg);
       }
     }
-  }, [destination, error, err, errorMsg]);
+  }, [destination, error, errorMsg]);
 
   // Function to add a marker
   const addMarker = (markerLat, markerLng, title) => {
@@ -112,6 +65,7 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
     }
   };
 
+  // FUNCTION FOR INTIALISING THE MAP AND RENDERING THE MARKERS
   const initMap = () => {
     if (!window.google || !window.google.maps) return;
 
@@ -122,7 +76,7 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
 
     const directionsRenderer = new window.google.maps.DirectionsRenderer();
     directionsRenderer.setMap(map);
-    directionsRendererRef.current = directionsRenderer; // Store the reference
+    directionsRendererRef.current = directionsRenderer;
 
     // Store map instance for markers
     mapRef.current.mapInstance = map;
@@ -133,29 +87,28 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
     // Add nearby recycling centers
     if (data) {
       renderNearbyLocation(data);
-    } else {
-      const interval = setInterval(() => {
-        if (data) {
-          clearInterval(interval);
-          renderNearbyLocation(data);
-        }
-      }, 100);
     }
   };
 
   useEffect(() => {
     // Ensure Google Maps API is loaded
-    if (isLoaded && mapRef.current) {
-      initMap();
-    } else {
-      const interval = setInterval(() => {
-        if (window.google && window.google.maps) {
-          clearInterval(interval);
-          initMap();
-        }
-      }, 100);
+    const interval = setInterval(() => {
+      if (isLoaded && window.google && window.google.maps) {
+        clearInterval(interval);
+        initMap();
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [mapRef, isLoaded, lat, lng]);
+
+  useEffect(() => {
+    if (destination.lat && destination.lng) {
+      navigate(
+        `/map-direction?originLat=${lat}&originLng=${lng}&destinationLat=${destination.lat}&destinationLng=${destination.lng}`
+      );
     }
-  }, [mapRef, isLoaded, lat, lng, data]);
+  }, [destination, navigate, lat, lng]);
 
   return (
     <div className="h-full">
@@ -166,7 +119,7 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
           {errorMessage}
         </div>
       ) : (
-        <div ref={mapRef} className="h-[80%] w-full"></div>
+        <div ref={mapRef} className="h-[100%] w-full"></div>
       )}
     </div>
   );

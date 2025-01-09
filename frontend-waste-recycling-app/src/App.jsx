@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { lazy, Suspense } from "react";
 import Spinner from "./Components/Spinner";
+const MapWithDirection = lazy(() => import("./Components/MapWithDirection"));
 const ParentQuiz = lazy(() => import("./Components/ParentQuiz"));
 const MainPage = lazy(() => import("./Pages/Main.page"));
 const LoginPage = lazy(() => import("./Pages/Login.page"));
@@ -18,6 +19,7 @@ function App() {
               <Route path="/signup" element={<SignupPage />}></Route>
               <Route path="/signin" element={<LoginPage />}></Route>
               <Route path="/quiz" element={<ParentQuiz />}></Route>
+              <Route path="/map-direction" element={<MapWithDirection />}></Route>
             </Routes>
           </div>
         </div>
