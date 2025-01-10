@@ -5,7 +5,11 @@ const app = express();
 // cors policy
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'https://localhost:5173'],
+    origin: [
+      'https://waste-recycling-app.vercel.app',
+      'https://localhost:5173',
+      'http://localhost:5173',
+    ],
     methods: ['GET', 'POST', 'DELETE', 'PATCH', 'PUT'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
