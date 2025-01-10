@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { QuizContext } from "../Context/Quiz.context";
 
 export default function OptionsRendrer({
   options,
   setBtn,
-  setOption,
   correctOption,
 }) {
+  const { setOption } = useContext(QuizContext);
   const [SelectedOption, setSelectedOption] = useState(null);
   function onclickHandler(idx) {
     setBtn(true);
@@ -29,7 +30,13 @@ export default function OptionsRendrer({
   );
 }
 
-function OptionCard({ option, idx, onclickHandler, correctOption, isSelected }) {
+function OptionCard({
+  option,
+  idx,
+  onclickHandler,
+  correctOption,
+  isSelected,
+}) {
   return (
     <button
       className={`bg-[#131f24] w-[80%] md:w-[90%] h-10 md:h-16 rounded-xl flex justify-center items-center mt-4 md:mt-2 border-t-2 border-l-2 border-r-2 border-b-4 ${

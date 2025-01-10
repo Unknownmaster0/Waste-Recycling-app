@@ -24,7 +24,7 @@ export default function useGetAllQuestions() {
         setData(response.data.data || []);
       } catch (error) {
         console.log(`error while getting questions: ${error}`);
-        setErr(error);
+        setErr(error.message);
       }
     })();
   }, []);

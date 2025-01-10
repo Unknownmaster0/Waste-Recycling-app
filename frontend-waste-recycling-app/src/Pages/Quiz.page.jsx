@@ -3,22 +3,23 @@ import OptionsRendrer from "../Components/OptionsRendrer";
 import ProgressBar from "../Components/Progress-bar";
 import ScoreCard from "../Components/ScoreCard";
 import QuestionRendrer from "../Components/QuestionRendrer";
-import React, { useEffect, useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import TextRendrer from "../Components/TextRendrer";
 import axios from "axios";
 import Spinner from "../Components/Spinner";
+import { QuizContext } from "../Context/Quiz.context";
+import useGetAllQuestions from "../Custom-hooks/useGetAllQuestions";
 
 // PARENT QUIZ IS THE MAIN COMPONENT.
 export default function QuizPage({
-  data,
   currentPage,
   setCurrentPage,
   load,
   setLoad,
-  pressedOption,
-  setOption,
 }) {
+  const { pressedOption, setOption } = useContext(QuizContext);
+  const { data, loading, err } = useGetAllQuestions();
   const navigate = useNavigate();
   const totalQuestions = data.length;
   const [questionsPerPage, setQuestionsPerPage] = useState(1);
@@ -102,9 +103,13 @@ export default function QuizPage({
     }
   }
 
+  if (err) {
+    return alert(err);
+  }
+
   return (
     <div className="h-screen">
-      {load ? (
+      {load || loading ? (
         <Spinner />
       ) : (
         <>
@@ -134,7 +139,6 @@ export default function QuizPage({
                     <RenderData
                       data={currentPageItem}
                       setBtn={setIsbtnActive}
-                      setOption={setOption}
                       correctOption={correctOption}
                     />
                   </div>
@@ -173,7 +177,7 @@ export default function QuizPage({
   );
 }
 
-function RenderData({ data, setBtn, setOption, correctOption }) {
+function RenderData({ data, setBtn, correctOption }) {
   return (
     <>
       {data?.length > 0 &&
@@ -183,7 +187,6 @@ function RenderData({ data, setBtn, setOption, correctOption }) {
             <OptionsRendrer
               options={data.options}
               setBtn={setBtn}
-              setOption={setOption}
               correctOption={correctOption}
             />
           </div>

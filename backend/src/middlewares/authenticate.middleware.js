@@ -5,7 +5,7 @@ import User from '../models/user.models.js';
 export const authenticateUser = async function (req, res, next) {
   const token = req.headers.authorization;
   if (!token) {
-    return res.status(401).json(new ApiResponse(401, 'token is required', ''));
+    return res.status(401).json(new ApiResponse(401, 'Log-in first', ''));
   }
   try {
     const payload = jwt.verify(token, process.env.ACCESS_TOKEN);

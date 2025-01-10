@@ -12,11 +12,7 @@ export default function MainPage() {
   useEffect(() => {
     setUserName(userName);
   }, [isLoggedIn, userName]);
-
-  if (err) {
-    alert(err);
-    return;
-  }
+  
   return (
     <>
       {loading ? (

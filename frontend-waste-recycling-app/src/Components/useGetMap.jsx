@@ -1,31 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import useGetNearbyLocation from "./useGetNearbyLocation";
-import Spinner from "../Components/Spinner";
+import Spinner from "./Spinner";
 import { useNavigate } from "react-router-dom";
 
-export default function UseGetMap({ userCoords, isLoaded, error }) {
+export default function UseGetMap({ userCoords, data }) {
   // console.log(`reached into the useGetMap`);
   const navigate = useNavigate();
-  const { data, errorMsg, loading } = useGetNearbyLocation(userCoords);
   const { lat, lng } = userCoords;
   const [destination, setDestination] = useState({ lat: null, lng: null });
-  const [isError, setIsError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
   const mapRef = useRef(null);
   const directionsRendererRef = useRef(null);
-
-  // Check for errors and render them
-  useEffect(() => {
-    if (destination.lat && destination.lng) {
-      if (error) {
-        setIsError(true);
-        setErrorMessage(errorMsg);
-      } else if (errorMsg) {
-        setIsError(true);
-        setErrorMessage(errorMsg);
-      }
-    }
-  }, [destination, error, errorMsg]);
 
   // Function to add a marker
   const addMarker = (markerLat, markerLng, title) => {
@@ -92,14 +75,14 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
   useEffect(() => {
     // Ensure Google Maps API is loaded
     const interval = setInterval(() => {
-      if (isLoaded && window.google && window.google.maps && mapRef && mapRef.current) {
+      if (window.google && window.google.maps && mapRef && mapRef.current) {
         clearInterval(interval);
         initMap();
       }
     }, 100);
 
     return () => clearInterval(interval);
-  }, [mapRef, isLoaded, lat, lng]);
+  }, [mapRef, lat, lng]);
 
   useEffect(() => {
     if (destination.lat && destination.lng) {
@@ -111,15 +94,7 @@ export default function UseGetMap({ userCoords, isLoaded, error }) {
 
   return (
     <div className="h-full">
-      {loading || !isLoaded ? (
-        <Spinner />
-      ) : isError ? (
-        <div className="h-full font-bold text-xl md:text-3xl lg:text-4xl text-red-700 font-serif">
-          {errorMessage}
-        </div>
-      ) : (
-        <div ref={mapRef} className="h-[100%] w-full"></div>
-      )}
+      <div ref={mapRef} className="h-[100%] w-full"></div>
     </div>
   );
 }

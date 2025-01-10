@@ -13,11 +13,14 @@ export default function useGetLoggedIn() {
     if (token) {
       (async () => {
         try {
-          const res = await axios.get(`${BACKEND_URL}/api/v1/user/verify-user`, {
-            headers: {
-              Authorization: token,
-            },
-          });
+          const res = await axios.get(
+            `${BACKEND_URL}/api/v1/user/verify-user`,
+            {
+              headers: {
+                Authorization: token,
+              },
+            }
+          );
           const response = await res.data;
           if (!response.success) {
             setErr(response.message);
@@ -26,12 +29,13 @@ export default function useGetLoggedIn() {
             setUserName(response.data.userName);
           }
         } catch (error) {
-            setErr(error.message);
+          setErr(error.message);
         } finally {
           setLoading(false);
         }
       })();
     } else {
+      setErr(`You are not authenticated`);
       setLoading(false);
     }
   }, []);
