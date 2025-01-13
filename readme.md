@@ -1,6 +1,6 @@
 # Waste Management App
 
-## **Tech Stack for Your App**
+## **Tech Stack for App**
 
 ### **Frontend:**
 
@@ -27,7 +27,7 @@
 
 ---
 
-## **Detailed Guidance for Features**
+## **Detailed Features**
 
 ### **1. Getting the Nearest Recycling Bin Address**
 
